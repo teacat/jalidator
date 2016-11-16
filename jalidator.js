@@ -19,7 +19,11 @@ export function validate (rule, data, init)
     // Skip the validation, only generate the empty data
     if(init === true)
         for(var r in rule)
-            res[r] = def()
+            res[r] =
+            {
+                ...def(),
+                info: rule[r]
+            }
 
     /**
      * Data scanner
@@ -27,13 +31,19 @@ export function validate (rule, data, init)
 
     for(var n in data)
     {
+        // Define rule and the data
+        var r = rule[n],
+            d = data[n]
+
         // Initialize the result for the data
-        res[n] = def()
+        res[n] =
+        {
+            ...def(),
+            info: r
+        }
 
         // Get the matched rule
-        var r         = rule[n],
-            d         = data[n],
-            required  = r.required !== undefined,
+        var required  = r.required !== undefined,
             nullable  = r.nullable !== undefined,
             min       = r.min       || false,
             max       = r.max       || false,
