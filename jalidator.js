@@ -2,8 +2,8 @@ export function validate (rule, data, init)
 {
     var init = init || false,
         res  = { valid: true, invalid: false },
-        def  =
-        {
+        def  = () =>
+        ({
             valid    : true,
             invalid  : false,
             min      : false,
@@ -14,12 +14,12 @@ export function validate (rule, data, init)
             required : false,
             type     : false,
             sameAs   : false
-        }
+        })
 
     // Skip the validation, only generate the empty data
     if(init === true)
         for(var r in rule)
-            res[r] = def
+            res[r] = def()
 
     /**
      * Data scanner
@@ -28,7 +28,7 @@ export function validate (rule, data, init)
     for(var n in data)
     {
         // Initialize the result for the data
-        res[n] = def
+        res[n] = def()
 
         // Get the matched rule
         var r         = rule[n],
