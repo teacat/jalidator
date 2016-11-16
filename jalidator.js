@@ -1,8 +1,4 @@
-// valudateValue(config.login.username, 'yamiodymel')
-function validateValue(rule, value){}
-
-// validate(config.login, {username: 'yamiodymel'})
-function validate(rule, data)
+export function validate (rule, data)
 {
     var res = { valid: true, invalid: false }
 
@@ -50,7 +46,16 @@ function validate(rule, data)
             res[n].required = true
         // Required but null and not nullable
         if(required && d === null && !nullable)
+        {
             res[n].required = true
+            continue
+        }
+        // Required but undefined
+        if(required && d === undefined)
+        {
+            res[n].required = true
+            continue
+        }
 
         /**
          * Length
@@ -144,20 +149,20 @@ function validate(rule, data)
      * Invalid, valid scanner
      */
 
-     for(var n in res)
-     {
-         for(var o in res[n])
-         {
-              if(res[n][o] === true)
-             {
-                 res.valid      = false
-                 res.invalid    = true
-                 res[n].valid   = false
-                 res[n].invalid = true
-                 break
-             }
-         }
-     }
+    for(var n in res)
+    {
+        for(var o in res[n])
+        {
+            if(o !== 'valid' && o !== 'invalid' && res[n][o] === true)
+            {
+                res.valid      = false
+                res.invalid    = true
+                res[n].valid   = false
+                res[n].invalid = true
+                break
+            }
+        }
+    }
 
-     return res
+    return res
 }
