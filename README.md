@@ -108,6 +108,61 @@ validation = validate(rule.login, {username: 'Yami', password: 'yami888'})
 validation = validate(rule.login, false, true)
 ```
 
+## 回傳
+
+伽莉蝶忒所回傳的資訊十分完整，除了驗證結果，還有驗證規則（方便你在網頁上顯示規則，如字數應小於多少⋯⋯等），該資訊是一個物件，先舉例，稍後將會詳細說明其個別用途。
+
+```js
+validation = validate(rule.login, false, true)
+console.log(validation)
+```
+
+則會回傳一個這樣的物件，要注意的是驗證結果在錯誤的時候會是 `true`，舉例來說：倘若 `username` 欄位是空的，那麼 `username.required` 則會是 `true`。如果你覺得這樣過於麻煩，你可以直接使用 `username.valid`，這會在 `username` **合格的時候返回 `true`**，反之，另一個 `username.invalid` 會在**不合格的時候返回 `true`**。
+
+```js
+{
+    // 總體的驗證結果
+    valid   : true,
+    invalid : false,
+    
+    // 資料 username 的驗證結果
+    username:
+    {
+        valid    : true,
+        invalid  : false,
+        info     : { ... } // username 的規則
+        min      : false,
+        max      : false,
+        minLength: false,
+        maxLength: false,
+        pattern  : false,
+        required : false,
+        type     : false,
+        sameAs   : false
+    },
+    
+    // 資料 password 的驗證結果
+    password:
+    {
+        // ...
+```
+
+### 規則資訊
+
+你可以看到上述範例中有個 `username.info`，每個驗證結果都會有一個 `info` 物件，這會帶有你先前在規則中設置的資料，方便你能夠用在其他地方，舉例來說：
+
+```pug
+span(v-show="validation.identifier.invalid")
+    | 帳號最短是 {{ validation.identifier.info.minLength }} 個字，
+    | 最長 {{ validation.identifier.info.maxLength }} 個字。
+```
+
+你就不必手動在網頁上重新打一次規則，因為你可以直接飲用你先前配置的規則，你可能會好奇，你還沒有驗證表單，這些資料要從哪裡來？還記得我們提到的「鷹架」嗎？不妨往回看看？
+
+## Todo
+
+這部分是開發者的筆記，使用者可以自行略過。
+
 ```js
 username :
 {
