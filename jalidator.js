@@ -10,24 +10,6 @@ var config =
     }
 }
 
-var returdn =
-{
-	valid: '',
-    invalid: '',
-    username:
-    {
-    	valid: '',
-        invalid: '',
-        min: '',
-        max: '',
-        email: '',
-        pattern: '',
-        required: '',
-        type: ''
-    }
-}
-
-
     
 // valudateValue(config.login.username, 'yamiodymel')
 function validateValue(rule, value){}
@@ -35,7 +17,7 @@ function validateValue(rule, value){}
 // validate(config.login, {username: 'yamiodymel'})
 function validate(rule, data)
 {
-	var res = {}
+	var res = { valid: true, invalid: false }
 
 	/**
      * Data scanner
@@ -46,7 +28,7 @@ function validate(rule, data)
     	// Initialize the result for the data
         res[n] = 
         {
-        	valid    : false,
+        	valid    : true,
             invalid  : false,
             min      : false,
             max      : false,
@@ -138,11 +120,57 @@ function validate(rule, data)
         //
         if(sameAs !== false && data[sameAs] !== undefined && d !== data[sameAs])
         	res[n].sameAs = true
+        
+        /**
+         * Type
+         */
+        
+        if(type !== false)
+        {
+        	var ipv4 = /^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$/g.test(d),
+            	ipv6 = /^((?:[0-9A-Fa-f]{1,4}))((?::[0-9A-Fa-f]{1,4}))*::((?:[0-9A-Fa-f]{1,4}))((?::[0-9A-Fa-f]{1,4}))*|((?:[0-9A-Fa-f]{1,4}))((?::[0-9A-Fa-f]{1,4})){7}$/g.test(d)
+        
+            switch(type)
+            {
+                case 'email': 
+                	if(!/\S+@\S+/.test(d))
+                    	res[n].type = true
+                    break
+                case 'ip'   :
+                	if(!ipv4 && !ipv6)
+                    	res[n].type = true
+                	break
+                case 'ipv4' :
+                	if(!ipv4)
+                    	res[n].type = true
+                	break
+                case 'ipv6' : break
+                	if(!ipv6)
+                    	res[n].type = true
+                    break
+                case 'url'  : break
+            }
+        }
     }
     
     /**
      * Invalid, valid scanner
      */
+     
+     for(var n in res)
+     {
+         for(var o in res[n])
+         {
+         	 if(res[n][o] === true)
+             {
+                 res.valid      = false
+                 res.invalid    = true
+                 res[n].valid   = false
+                 res[n].invalid = true
+                 break
+             }
+         }
+     }
 }
 
 
