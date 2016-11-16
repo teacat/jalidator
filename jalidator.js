@@ -1,15 +1,8 @@
-export function validate (rule, data)
+export function validate (rule, data, init)
 {
-    var res = { valid: true, invalid: false }
-
-    /**
-     * Data scanner
-     */
-
-    for(var n in data)
-    {
-        // Initialize the result for the data
-        res[n] =
+    var init = init || false,
+        res  = { valid: true, invalid: false },
+        def  =
         {
             valid    : true,
             invalid  : false,
@@ -23,9 +16,23 @@ export function validate (rule, data)
             sameAs   : false
         }
 
+    // Skip the validation, only generate the empty data
+    if(init === true)
+        for(var r in rule)
+            res[r] = def
+
+    /**
+     * Data scanner
+     */
+
+    for(var n in data)
+    {
+        // Initialize the result for the data
+        res[n] = def
+
         // Get the matched rule
-        var r = rule[n],
-            d = data[n],
+        var r         = rule[n],
+            d         = data[n],
             required  = r.required !== undefined,
             nullable  = r.nullable !== undefined,
             min       = r.min       || false,
@@ -149,17 +156,20 @@ export function validate (rule, data)
      * Invalid, valid scanner
      */
 
-    for(var n in res)
+    if(init !== true)
     {
-        for(var o in res[n])
+        for(var n in res)
         {
-            if(o !== 'valid' && o !== 'invalid' && res[n][o] === true)
+            for(var o in res[n])
             {
-                res.valid      = false
-                res.invalid    = true
-                res[n].valid   = false
-                res[n].invalid = true
-                break
+                if(o !== 'valid' && o !== 'invalid' && res[n][o] === true)
+                {
+                    res.valid      = false
+                    res.invalid    = true
+                    res[n].valid   = false
+                    res[n].invalid = true
+                    break
+                }
             }
         }
     }
