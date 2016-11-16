@@ -1,10 +1,10 @@
 # Jalidator
 
-伽莉蝶忒是一個輕量、簡單且容易上手的 JavaScript 資料表單驗證工具，毋須與 DOM 做綁定，單純作為檢驗資料的工具。
+[伽莉蝶忒](https://github.com/TeaMeow/Jalidator)是一個輕量、簡單且容易上手的 JavaScript 資料表單驗證工具，毋須與 DOM 做綁定，單純作為檢驗資料的工具。
 
 ## 引用檔案
 
-伽莉蝶忒是開發給 Webpack 或是 Node.js 所使用，倘若要用在瀏覽器上的話，瀏覽器則需要支援 ES6 的 `import` 和 `export`。
+[伽莉蝶忒](https://github.com/TeaMeow/Jalidator)是開發給 Webpack 或是 Node.js 所使用，倘若要用在瀏覽器上的話，瀏覽器則需要支援 ES6 的 `import` 和 `export`。
 
 ```js
 import { validate } from 'jalidator'
@@ -12,7 +12,7 @@ import { validate } from 'jalidator'
 
 ## 配給規則
 
-與先前敘述的相同，這是個表單驗證工具，這意味著你需要手動配置規則，令人放心的是因為伽莉蝶忒**並不是**基於 DOM 的綁定或是 HTML5 的 Attributes。因此你可以將規則獨立成一個檔案，這將令你在未來的管理和擴展上更得心應手。
+與先前敘述的相同，這是個表單驗證工具，這意味著你需要手動配置規則，令人放心的是因為伽莉蝶忒**並不是**基於 DOM 的綁定或是 HTML5 的 Attributes。因此你可以將規則**獨立成一個檔案**或是**分開整理**，這將令你在未來的管理和擴展上更得心應手。
 
 一個最基本的規則範例如下：
 
@@ -100,7 +100,7 @@ validation = validate(rule.login, {username: 'Yami', password: 'yami888'})
 
 ### 鷹架
 
-有些時候你會先在網頁佈局上透過像是 `v-show="validation.password.invalid"` 來在稍後表單錯誤時呈現錯誤訊息，但是因為表單還尚未驗證，所以也就沒有錯誤訊息可言，當然，也就沒有所謂的 `validation.password` 因為一切都還沒有被執行，預料到某些框架（如：Vue.js）有可能會為此抱怨 ` Cannot read property 'length' of ...`，你可以事先初始化一個鷹架（意即：空的驗證資料），這個空的資料跟稍後驗證所回傳的資料近乎一模一樣，不過不會顯示任何錯誤罷了。
+有些時候你會先在網頁佈局上透過像是 `v-show="validation.password.invalid"` 來在稍後表單錯誤時呈現錯誤訊息，但是因為表單還尚未驗證，所以也就沒有錯誤訊息可言，當然，也就沒有所謂的 `validation.password` 因為一切都還沒有被執行，預料到某些框架（如：Vue.js）有可能會為此抱怨 ` Cannot read property 'invalid' of ...`，為此，你可以事先初始化一個鷹架（意即：空的驗證資料），這個空的資料跟稍後驗證所回傳的資料近乎一模一樣，不過不會顯示任何錯誤罷了，但卻可以對付並解決錯誤問題。
 
 這做法很簡單，第二個參數設為 `false`，第三個參數設為 `true` 即可。
 
@@ -113,11 +113,11 @@ validation = validate(rule.login, false, true)
 伽莉蝶忒所回傳的資訊十分完整，除了驗證結果，還有驗證規則（方便你在網頁上顯示規則，如字數應小於多少⋯⋯等），該資訊是一個物件，先舉例，稍後將會詳細說明其個別用途。
 
 ```js
-validation = validate(rule.login, false, true)
+validation = validate(rule.login, {username: 'Yami', password: 'yami888'})
 console.log(validation)
 ```
 
-則會回傳一個這樣的物件，要注意的是驗證結果在錯誤的時候會是 `true`，舉例來說：倘若 `username` 欄位是空的，那麼 `username.required` 則會是 `true`。如果你覺得這樣過於麻煩，你可以直接使用 `username.valid`，這會在 `username` **合格的時候返回 `true`**，反之，另一個 `username.invalid` 會在**不合格的時候返回 `true`**。
+則會回傳一個這樣的物件，要注意的是**驗證結果在錯誤的時候會是 `true`**，舉例來說：倘若 `username` 欄位是空的，那麼 `username.required` 則會是 `true`。如果你覺得這樣過於麻煩，你可以直接使用 `username.valid`，這會在 `username` **合格的時候返回 `true`**，反之，另一個 `username.invalid` 會在**不合格的時候返回 `true`**。
 
 ```js
 {
@@ -151,13 +151,29 @@ console.log(validation)
 
 你可以看到上述範例中有個 `username.info`，每個驗證結果都會有一個 `info` 物件，這會帶有你先前在規則中設置的資料，方便你能夠用在其他地方，舉例來說：
 
-```pug
-span(v-show="validation.identifier.invalid")
-    | 帳號最短是 {{ validation.identifier.info.minLength }} 個字，
-    | 最長 {{ validation.identifier.info.maxLength }} 個字。
+```js
+username:
+{
+   info:
+   {
+       minLength: 8,
+       maxLength: 80,
+       required : true
+   }
+   
+   // ...
+}
 ```
 
-你就不必手動在網頁上重新打一次規則，因為你可以直接飲用你先前配置的規則，你可能會好奇，你還沒有驗證表單，這些資料要從哪裡來？還記得我們提到的「鷹架」嗎？不妨往回看看？
+然後你就可以像這樣在網頁上呼叫你的規則出來使用：
+
+```pug
+span(v-show="validation.username.invalid")
+    | 帳號最短是 {{ validation.username.info.minLength }} 個字，
+    | 最長 {{ validation.username.info.maxLength }} 個字。
+```
+
+你就不必手動在網頁上重新打一次規則，因為你可以直接引用你先前配置的規則，你可能會好奇，你還沒有驗證表單，這些資料要從哪裡來？還記得我們提到的「**鷹架**」嗎？不妨往回看看？
 
 ## Todo
 
