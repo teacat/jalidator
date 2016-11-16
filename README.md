@@ -25,3 +25,10 @@ username :
     
 }
 ```
+
+
+```js
+required: '!username'
+
+required: 'password'
+```
