@@ -7,12 +7,21 @@ username :
     type: 'email',
     min: 2,
     max: 30,
-    minlength: 30,
-    maxlength: 50,
+    minLength: 30,
+    maxLength: 50,
     pattern: '/xx/',
     custom: (val) =>
     {
     },
-    custom: [() => {}, () => {}]
+    custom: [() => {}, () => {}],
+    sameAs: 'password',
+    date:
+    {
+        // leap year
+        direction: 'future',
+        month: 'month',
+        day: 'day'
+    },
+    
 }
 ```
