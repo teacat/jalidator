@@ -35,6 +35,9 @@ export function validate (rule, data, init)
         var r = rule[n],
             d = data[n]
 
+        if(r === undefined)
+            continue
+
         // Initialize the result for the data
         res[n] =
         {
