@@ -128,17 +128,18 @@ console.log(validation)
     // 資料 username 的驗證結果
     username:
     {
-        valid    : true,
-        invalid  : false,
-        info     : { ... } // username 的規則
-        min      : false,
-        max      : false,
-        minLength: false,
-        maxLength: false,
-        pattern  : false,
-        required : false,
-        type     : false,
-        sameAs   : false
+        valid     : true,
+        invalid   : false,
+        info      : { ... } // username 的規則
+        breakpoint: { ... } // 中繼點，稍後說明
+        min       : false,
+        max       : false,
+        minLength : false,
+        maxLength : false,
+        pattern   : false,
+        required  : false,
+        type      : false,
+        sameAs    : false
     },
     
     // 資料 password 的驗證結果
@@ -167,13 +168,66 @@ username:
 
 然後你就可以像這樣在網頁上呼叫你的規則出來使用：
 
-```pug
+```jade
 span(v-show="validation.username.invalid")
     | 帳號最短是 {{ validation.username.info.minLength }} 個字，
     | 最長 {{ validation.username.info.maxLength }} 個字。
 ```
 
 你就不必手動在網頁上重新打一次規則，因為你可以直接引用你先前配置的規則，你可能會好奇，你還沒有驗證表單，這些資料要從哪裡來？還記得我們提到的「**鷹架**」嗎？不妨往回看看？
+
+### 中繼點
+
+在剛才的範例中你可以看到 `username.breakpoint`，中繼點中包含的內容跟回傳內容是一樣地：
+
+```js
+{
+    valid     : true,
+    invalid   : false,
+    min       : false,
+    max       : false,
+    minLength : false,
+    maxLength : false,
+    pattern   : false,
+    required  : false,
+    type      : false,
+    sameAs    : false
+}
+```
+
+那麼中繼點到底是做什麼的呢？中繼點只會出現在第一個錯誤欄位，而其他的錯誤欄位中繼點將會是一個空白的 `{}` 物件，如果你還不明白，在這裡稍微說明，假設我們有三個錯誤的欄位（意即：皆無通過驗證），中繼點只會出現在最先錯誤的欄位。
+
+```js
+error  <-- 這裡會有中繼點
+error  <-- 這裡的中繼點是空物件：{}
+error  <-- 這裡的中繼點是空物件：{}
+```
+
+但是如果第一個欄位是成功的，那麼中繼點則會順移到下一個錯誤的欄位。
+
+```js
+success  
+error   <-- 這裡會有中繼點
+error   <-- 這裡的中繼點是空物件：{}
+```
+
+這個用途是在有些時候你會希望循序的個別處理錯誤，而不希望錯誤一次全部跳出來，通常來說你可以使用 `if ... elseif` 來處理這個問題，但像是 Vue.js 目前還沒有 `elseif` 的功能，導致你需要這樣：
+
+```jade
+span(v-show="validation.username.invalid")
+    | 帳號錯誤
+span(v-show="validation.username.valid && validation.password.invalid")
+    | 密碼錯誤
+```
+
+倘若你使用中繼點，就可以像這樣縮短條件式：
+
+```jade
+span(v-show="validation.username.breakpoint.invalid")
+    | 帳號錯誤
+span(v-show="validation.password.breakpoint.invalid")
+    | 密碼錯誤
+```
 
 ## Todo
 
