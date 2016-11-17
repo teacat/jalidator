@@ -22,7 +22,8 @@ export function validate (rule, data, init)
             res[r] =
             {
                 ...def(),
-                info: rule[r]
+                info      : rule[r],
+                breakpoint: {}
             }
 
     /**
@@ -42,7 +43,8 @@ export function validate (rule, data, init)
         res[n] =
         {
             ...def(),
-            info: r
+            info      : r,
+            breakpoint: {}
         }
 
         // Get the matched rule
@@ -76,6 +78,9 @@ export function validate (rule, data, init)
             res[n].required = true
             continue
         }
+        // Skip if not required and empty
+        if(!required && (d === undefined || d === null || d === ""))
+            continue
 
         /**
          * Length
@@ -104,8 +109,13 @@ export function validate (rule, data, init)
          */
 
         // If not valid with the custom pattern
-        if(pattern !== false && !pattern.test(d))
-            res[n].pattern = true
+        if(pattern !== false)
+        {
+            var p = new RegExp(pattern)
+
+            if(!p.test(d))
+                res[n].pattern = true
+        }
 
         /**
          * Custom Validator
@@ -175,6 +185,8 @@ export function validate (rule, data, init)
 
     if(init !== true)
     {
+        var breakpointIsset = false
+
         for(var n in res)
         {
             for(var o in res[n])
@@ -185,6 +197,18 @@ export function validate (rule, data, init)
                     res.invalid    = true
                     res[n].valid   = false
                     res[n].invalid = true
+
+                    // Set the breakpoint and mark as isset
+                    if(!breakpointIsset)
+                    {
+                        breakpointIsset   = true
+                        res[n].breakpoint = Object.assign({}, res[n])
+
+                        // Remove unnecessary data
+                        delete res[n].breakpoint.breakpoint
+                        delete res[n].breakpoint.info
+                    }
+
                     break
                 }
             }
